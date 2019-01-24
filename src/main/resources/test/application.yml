@@ -1,0 +1,21 @@
+#---------This is the configurable file---------#
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/springproject?useSSL=false
+    username: root
+    password: password
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    show-sql: true
+
+# ===================================================================
+# project specific properties
+# ===================================================================
+spring-project:
+  security:
+    authentication:
+      jwt:
+        secret: my-secret-token-to-change-in-production-my-secret-token-to-change-in-testing
+        # Token is valid 24 hours
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000

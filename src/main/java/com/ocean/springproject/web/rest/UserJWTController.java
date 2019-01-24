@@ -43,7 +43,7 @@ public class UserJWTController {
         String jwt = tokenProvider.createToken(authentication, rememberMe);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTConfigurer.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        return new ResponseEntity<>(new JWTToken(jwt), HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
     static class JWTToken {

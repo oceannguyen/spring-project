@@ -15,7 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import javax.annotation.PostConstruct;
 
@@ -62,7 +62,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
 //                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf()
-                .disable()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .and()
                 .headers()
                 .frameOptions()
                 .disable()
@@ -72,6 +73,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
                 .authorizeRequests()
                 .antMatchers("/api/authenticate").permitAll()
+                .antMatchers("/api/ping").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .apply(securityConfigurerAdapter());
