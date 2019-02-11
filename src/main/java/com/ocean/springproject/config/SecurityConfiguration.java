@@ -16,8 +16,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -60,13 +63,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-//                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .cors()
+            .and()
                 .csrf()
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
-                .headers()
-                .frameOptions()
-                .disable()
             .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -76,7 +76,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/ping").permitAll()
                 .anyRequest().authenticated()
             .and()
-                .apply(securityConfigurerAdapter());
+                .apply(securityConfigurerAdapter())
+            .and()
+                .headers()
+                .defaultsDisabled()
+                .frameOptions()
+                .sameOrigin()
+                .contentSecurityPolicy("frame-ancestors 'none'");
     }
 
     private JWTConfigurer securityConfigurerAdapter() {
@@ -85,5 +91,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private JWTFilter jwtFilter() {
         return new JWTFilter(tokenProvider);
+    }
+
+    @Bean
+    CorsConfigurationSource  corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://192.168.156.25"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
